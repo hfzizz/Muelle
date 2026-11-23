@@ -1,0 +1,31 @@
+name: Build my installer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install Settings app dependencies
+        working-directory: apps/settings
+        run: pnpm install
+
+      - name: Build installer
+        shell: pwsh
+        run: .\scripts\build-installer.ps1
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Muelle-installer
+          path: target/release/bundle/nsis/*-setup.exe
